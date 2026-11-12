@@ -1,0 +1,117 @@
+erDiagram
+    CLIENTE ||--o| CLIENTE_PF : "é (se tipo = PF)"
+    CLIENTE ||--o| CLIENTE_PJ : "é (se tipo = PJ)"
+    CLIENTE ||--o{ FORMA_PAGAMENTO : "cadastra"
+    CLIENTE ||--o{ PEDIDO : "faz"
+    PEDIDO ||--|{ PEDIDO_PAGAMENTO : "é pago por"
+    FORMA_PAGAMENTO ||--o{ PEDIDO_PAGAMENTO : "usada em"
+    PEDIDO ||--o| ENTREGA : "gera"
+    PEDIDO ||--|{ PEDIDO_PRODUTO : "contém"
+    PRODUTO ||--o{ PEDIDO_PRODUTO : "aparece em"
+    PRODUTO ||--o{ PRODUTO_ESTOQUE : "armazenado em"
+    ESTOQUE ||--o{ PRODUTO_ESTOQUE : "guarda"
+    FORNECEDOR ||--o{ PRODUTO_FORNECEDOR : "fornece"
+    PRODUTO ||--o{ PRODUTO_FORNECEDOR : "fornecido por"
+    VENDEDOR_TERCEIRO ||--o{ PRODUTO_VENDEDOR : "vende"
+    PRODUTO ||--o{ PRODUTO_VENDEDOR : "vendido por"
+
+    CLIENTE {
+        int idCliente PK
+        string email UK
+        string telefone
+        string endereco
+        enum tipo "PF ou PJ (discriminador)"
+    }
+    CLIENTE_PF {
+        int idCliente PK, FK
+        string nome
+        char cpf UK "11 dígitos"
+        date dataNascimento
+    }
+    CLIENTE_PJ {
+        int idCliente PK, FK
+        string razaoSocial
+        string nomeFantasia
+        char cnpj UK "14 dígitos"
+    }
+    FORMA_PAGAMENTO {
+        int idFormaPagamento PK
+        int idCliente FK
+        enum tipo "Cartão, Boleto, Pix"
+        string apelido "ex: Cartão Nubank"
+        string numeroCartaoFinal "só últimos 4 dígitos"
+        date validade
+        bool ativo
+    }
+    PEDIDO {
+        int idPedido PK
+        int idCliente FK
+        datetime dataPedido
+        enum status "Em processamento, Confirmado, Cancelado"
+        string descricao
+        decimal frete
+    }
+    PEDIDO_PAGAMENTO {
+        int idPedido PK, FK
+        int idFormaPagamento PK, FK
+        decimal valor
+        enum status "Pendente, Aprovado, Recusado"
+    }
+    ENTREGA {
+        int idEntrega PK
+        int idPedido FK, UK
+        string codigoRastreio UK
+        enum status "Aguardando envio, Em trânsito, Entregue, Devolvido"
+        date dataEnvio
+        date dataPrevista
+        date dataEntrega
+    }
+    PRODUTO {
+        int idProduto PK
+        string nome
+        enum categoria "Eletrônico, Vestuário, Alimentos, Móveis, Brinquedos"
+        string descricao
+        decimal valor
+        float avaliacao
+        string dimensoes
+    }
+    PEDIDO_PRODUTO {
+        int idPedido PK, FK
+        int idProduto PK, FK
+        int quantidade
+        enum status "Disponível, Sem estoque"
+    }
+    ESTOQUE {
+        int idEstoque PK
+        string local
+    }
+    PRODUTO_ESTOQUE {
+        int idProduto PK, FK
+        int idEstoque PK, FK
+        int quantidade
+    }
+    FORNECEDOR {
+        int idFornecedor PK
+        string razaoSocial
+        char cnpj UK
+        string contato
+    }
+    PRODUTO_FORNECEDOR {
+        int idFornecedor PK, FK
+        int idProduto PK, FK
+        int quantidade
+    }
+    VENDEDOR_TERCEIRO {
+        int idVendedor PK
+        string razaoSocial
+        string nomeFantasia
+        char cnpj UK "opcional"
+        char cpf UK "opcional"
+        string local
+        string contato
+    }
+    PRODUTO_VENDEDOR {
+        int idVendedor PK, FK
+        int idProduto PK, FK
+        int quantidade
+    }
